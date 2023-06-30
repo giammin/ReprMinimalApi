@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33815.320
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReprMinimalApi", "ReprMinimalApi\ReprMinimalApi.csproj", "{CF473379-1E4F-408C-8EE3-D9584054468E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{467960B0-A35F-4655-845C-1182EC8E2871}"
+	ProjectSection(SolutionItems) = preProject
+		..\.gitlab-ci.yml = ..\.gitlab-ci.yml
+		Directory.Build.props = Directory.Build.props
+		Directory.Build.targets = Directory.Build.targets
+		Dockerfile = Dockerfile
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CF473379-1E4F-408C-8EE3-D9584054468E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF473379-1E4F-408C-8EE3-D9584054468E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF473379-1E4F-408C-8EE3-D9584054468E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF473379-1E4F-408C-8EE3-D9584054468E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CD13F1A3-348B-47CD-A347-C1D4061E1BF7}
+	EndGlobalSection
+EndGlobal

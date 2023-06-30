@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <UserSecretsId>56804992-5890-436d-a42e-c28785327862</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+  </PropertyGroup>
+
+	<PropertyGroup>
+		<ContainerRuntimeIdentifier>linux-x64</ContainerRuntimeIdentifier>
+		<ContainerImageTags>$(Version);latest</ContainerImageTags>
+	</PropertyGroup>
+	<ItemGroup>
+		<ContainerEnvironmentVariable Include="Kestrel__Endpoints__Http__Url" Value="http://0.0.0.0:5000" />
+		<ContainerEnvironmentVariable Include="ASPNETCORE_ENVIRONMENT" Value="Production" />
+	</ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="11.5.2" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.7" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.18.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+  </ItemGroup>
+
+</Project>

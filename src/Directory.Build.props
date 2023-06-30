@@ -1,0 +1,27 @@
+<Project>
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+		<LangVersion>latest</LangVersion>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<!--<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<NoWarn>$(NoWarn);1591</NoWarn>-->
+		<Deterministic>true</Deterministic>
+		<DebugType>embedded</DebugType>
+		<TreatWarningsAsErrors Condition=" '$(Configuration)' == 'Release' ">true</TreatWarningsAsErrors>
+		<AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<debugSuffix Condition=" '$(Configuration)' == 'Debug' "> - debug version</debugSuffix>
+		<VersionPrefix>1.0</VersionPrefix>
+		<buildNumber>0</buildNumber>
+		<VersionSuffix>$([System.DateTime]::Now.ToString(yyMM)).$([System.DateTime]::Now.ToString(dd))</VersionSuffix>
+		<Version>$(VersionPrefix).$(VersionSuffix)$(buildNumber)</Version>
+		<PackageVersion>$(Version)</PackageVersion>
+		<Product>ReprMinimalApi$(debugSuffix)</Product>
+		<Authors>giammin</Authors>
+		<Copyright>Copyright $([System.DateTime]::Now.Year) (c) $(Company) All rights reserved.</Copyright>
+	</PropertyGroup>
+</Project>
+
