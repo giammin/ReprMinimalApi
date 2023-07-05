@@ -23,7 +23,6 @@ if (app.Environment.IsProduction() || app.Environment.IsStaging())
 }
 
 app
-    .UseHappyBot()
     .UseLogging()
     .UseCors();
 

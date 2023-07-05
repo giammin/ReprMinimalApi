@@ -1,8 +1,8 @@
 ﻿using System.Diagnostics;
-using System.Net;
-using System.Text.Json;
+using ReprMinimalApi.Core;
+using ReprMinimalApi.Utils;
 
-namespace ReprMinimalApi;
+namespace ReprMinimalApi.Middleware;
 
 public class WebLoggerMiddleware
 {
@@ -17,7 +17,7 @@ public class WebLoggerMiddleware
 
     public async Task Invoke(HttpContext context, ILogger<WebLoggerMiddleware> logger)
     {
-        long start=0;
+        long start = 0;
         if (logger.IsEnabled(_settings.LogLevel))
         {
             logger.Log(_settings.LogLevel, await WebLoggerHelper.GetRequestDataAsync(context.Request, _settings.IncludeBody).ConfigureAwait(false));
@@ -31,7 +31,7 @@ public class WebLoggerMiddleware
             {
                 var stop = Stopwatch.GetTimestamp();
                 var elapsed = new TimeSpan(stop - start);
-                logger.Log(_settings.LogLevel, "RESPONSE: {guid} took {seconds}ms",WebLoggerHelper.GetRequestUid(context), elapsed.TotalMilliseconds);
+                logger.Log(_settings.LogLevel, "RESPONSE: {guid} took {seconds}ms", WebLoggerHelper.GetRequestUid(context), elapsed.TotalMilliseconds);
                 logger.Log(_settings.LogLevel, WebLoggerHelper.GetResponseDataAsync(context.Response));
             }
         }
@@ -45,19 +45,26 @@ public class WebLoggerMiddleware
             {
                 logger.LogError(exception, "RESPONSE: {guid} throw exception", WebLoggerHelper.GetRequestUid(context));
             }
-            
+
             if (!_settings.HandleExceptionResponse)
             {
                 throw;
             }
 
-            var jsonException = new ExceptionJsonReturn(exception);
-            var result = JsonSerializer.Serialize(jsonException);
-            context.Response.ContentType = "application/json";
-            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            //var jsonException = new ExceptionJsonReturn(exception);
+            //var result = JsonSerializer.Serialize(jsonException);
+            //context.Response.ContentType = "application/json";
+            //context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            //logger.LogInformation("RESPONSE: {guid} Returning {statusCode} response: {response}", WebLoggerHelper.GetRequestUid(context), context.Response.StatusCode,
+            //    jsonException);
+
+
+            var problemDetails = exception.ToProblemDetails();
             logger.LogInformation("RESPONSE: {guid} Returning {statusCode} response: {response}", WebLoggerHelper.GetRequestUid(context), context.Response.StatusCode,
-                jsonException);
-            await context.Response.WriteAsync(result);
+                problemDetails.Extensions[ResultExtensions.ProblemDetailsExtensionsException]);
+
+            await Results.Problem(problemDetails).ExecuteAsync(context);
+
         }
     }
 }

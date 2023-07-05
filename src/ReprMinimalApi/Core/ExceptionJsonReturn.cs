@@ -1,4 +1,4 @@
-namespace ReprMinimalApi;
+namespace ReprMinimalApi.Core;
 
 
 public record ExceptionJsonReturn

@@ -1,4 +1,4 @@
-namespace ReprMinimalApi;
+namespace ReprMinimalApi.Utils;
 
 public static class MultipartRequestHelper
 {

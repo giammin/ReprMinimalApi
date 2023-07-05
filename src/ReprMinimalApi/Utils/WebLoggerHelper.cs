@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace ReprMinimalApi;
+namespace ReprMinimalApi.Utils;
 
 public static class WebLoggerHelper
 {
@@ -42,7 +42,7 @@ public static class WebLoggerHelper
         {
             sb.AppendLine($"{enumerator.Current.Key}={string.Join(",", enumerator.Current.Value!)}");
         }
-        
+
         return sb.ToString();
     }
 
@@ -52,7 +52,7 @@ public static class WebLoggerHelper
 
         request.Body.Seek(0, SeekOrigin.Begin);
         const int maxLength = 32 * 1024;
-        var length = request.Body.Length > maxLength? maxLength: request.Body.Length;
+        var length = request.Body.Length > maxLength ? maxLength : request.Body.Length;
         //using var sr = new StreamReader(response.Body);
         //var rtn = await sr.ReadToEndAsync();
         var buffer = new byte[length];

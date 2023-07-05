@@ -1,6 +1,11 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.Rewrite;
+using ReprMinimalApi.Filters;
+using ReprMinimalApi.Middleware;
+using ReprMinimalApi.Posts;
+using ReprMinimalApi.Utils;
+using System.Text.RegularExpressions;
 
 namespace ReprMinimalApi;
 
@@ -8,8 +13,8 @@ public static class ConfigExtensions
 {
     public static WebApplicationBuilder ConfigureServices(this WebApplicationBuilder builder)
     {
-        builder.Services.AddTransient<ValidationPipeline>();
         builder.Services.AddTransient<CreatePostHandler>();
+        builder.Services.AddTransient<GenericFluentValidationFilter<CreatePostCommand>>();
         builder.Services.AddTransient<IValidator<CreatePostCommand>, CreatePostCommandValidator>();
 
         builder.Services.AddEndpointsApiExplorer();
@@ -24,14 +29,7 @@ public static class ConfigExtensions
     {
         //HEALTHCHECK
         app.MapGet("", () => Results.Ok());
-
-        app.MapPost("/createpost", (
-            CreatePostCommand command,
-            CreatePostHandler handler,
-            ValidationPipeline pipeline,
-            CancellationToken cancellationToken
-        ) => pipeline.Exec(command, handler.Handle, cancellationToken));
-
+        app.MapPostEndpoints();
         return app;
     }
 
@@ -79,9 +77,9 @@ public static class ConfigExtensions
             .Add(context =>
             {
                 var path = context.HttpContext.Request.Path;
-                if (path.HasValue && Configuration.BotRequestRegex.IsMatch(path.Value))
+                if (path.HasValue && BotRequestRegex.IsMatch(path.Value))
                 {
-                    var redirectUrl = Configuration.TenHoursOfFun[Random.Shared.Next(0, Configuration.TenHoursOfFun.Length)];
+                    var redirectUrl = TenHoursOfFun[Random.Shared.Next(0, TenHoursOfFun.Length)];
                     var request = WebLoggerHelper.GetRequestDataAsync(context.HttpContext.Request).GetAwaiter().GetResult();
                     context.Logger.LogDebug("Bot found redirecting to {redirectUrl} request: {request}", redirectUrl, request);
                     context.Result = RuleResult.EndResponse;
@@ -92,10 +90,39 @@ public static class ConfigExtensions
         app.UseRewriter(options);
         return app;
     }
+
     public static IApplicationBuilder UseWebLoggerMiddleware(this IApplicationBuilder builder, Action<WebLoggerMiddlewareSettings>? action = null)
     {
         var config = new WebLoggerMiddlewareSettings();
         action?.Invoke(config);
         return builder.UseMiddleware<WebLoggerMiddleware>(config);
     }
+    public static bool Debug
+#if DEBUG
+        => true;
+#else
+        => false;
+#endif
+    public static readonly Regex BotRequestRegex = new("^.*(\\.yaml|\\.old|\\.bak|\\.xml|\\.cfg|\\.js|\\.ini|phpinfo|\\.txt|\\.php[\\d]?|\\.?env(\\.|\\/)?\\d?(old|prod|staging)?)$", RegexOptions.Compiled & RegexOptions.IgnoreCase & RegexOptions.Singleline, TimeSpan.FromSeconds(1));
+
+    public static readonly string[] TenHoursOfFun =
+    {
+        "https://www.youtube.com/watch?v=wbby9coDRCk",
+        "https://www.youtube.com/watch?v=nb2evY0kmpQ",
+        "https://www.youtube.com/watch?v=z9Uz1icjwrM",
+        "https://www.youtube.com/watch?v=Sagg08DrO5U",
+        "https://www.youtube.com/watch?v=5XmjJvJTyx0",
+        "https://www.youtube.com/watch?v=jScuYd3_xdQ",
+        "https://www.youtube.com/watch?v=S5PvBzDlZGs",
+        "https://www.youtube.com/watch?v=9UZbGgXvCCA",
+        "https://www.youtube.com/watch?v=O-dNDXUt1fg",
+        "https://www.youtube.com/watch?v=MJ5JEhDy8nE",
+        "https://www.youtube.com/watch?v=VnnWp_akOrE",
+        "https://www.youtube.com/watch?v=jwGfwbsF4c4",
+        "https://www.youtube.com/watch?v=hGlyFc79BUE",
+        "https://www.youtube.com/watch?v=xA8-6X8aR3o",
+        "https://www.youtube.com/watch?v=7R1nRxcICeE",
+        "https://www.youtube.com/watch?v=bIoe_IR9MB8",
+        "https://www.youtube.com/watch?v=sCNrK-n68CM"
+    };
 }
