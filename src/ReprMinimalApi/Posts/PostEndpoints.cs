@@ -1,4 +1,5 @@
-﻿using ReprMinimalApi.Core;
+﻿using Microsoft.AspNetCore.Mvc;
+using ReprMinimalApi.Core;
 using ReprMinimalApi.Filters;
 
 namespace ReprMinimalApi.Posts;
@@ -15,16 +16,19 @@ public static class PostEndpoints
             .ToCreatedResponse(i => new CreatedResponse<int>($"/api/posts/{i}",i)))
             .AddEndpointFilter<GenericFluentValidationFilter<CreatePostCommand>>();
 
+        app.MapGet("/api/posts/{id:int}", async ([AsParameters]
+                    GetPostQuery query,
+                    GetPostHandler handler,
+                    CancellationToken cancellationToken
+                ) => (await handler.HandleAsync<FailResult>(query, cancellationToken))
+                .ToOkResponse(i => new GetPostContract(i.Title, i.Text)))
+            .AddEndpointFilter<GenericFluentValidationFilter<GetPostQuery>>();
 
-
-
-
-        //app.MapPut("/api/posts/{id:int}", (
-        //        CreatePostCommand command,
-        //        CreatePostHandler handler,
-        //        CancellationToken cancellationToken
-        //    ) => handler.HandleAsync(command, cancellationToken))
-        //    .AddEndpointFilter<GenericFluentValidationFilter<CreatePostCommand>>();
+        app.MapGet("/api/posts", async (
+                    GetAllPostsHandler handler,
+                    CancellationToken cancellationToken
+                ) => (await handler.HandleAsync<FailResult>(cancellationToken))
+                .ToOkResponse(p=>p.Select(i=>new GetPostContract(i.Title, i.Text)) ));
 
         //app.MapDelete("/api/posts/{id:int}", (
         //        CreatePostCommand command,
@@ -33,18 +37,12 @@ public static class PostEndpoints
         //    ) => handler.HandleAsync(command, cancellationToken))
         //    .AddEndpointFilter<GenericFluentValidationFilter<CreatePostCommand>>();
 
-        //app.MapGet("/api/posts/{id:int}", (
+        //app.MapPut("/api/posts/{id:int}", (
         //        CreatePostCommand command,
         //        CreatePostHandler handler,
         //        CancellationToken cancellationToken
         //    ) => handler.HandleAsync(command, cancellationToken))
         //    .AddEndpointFilter<GenericFluentValidationFilter<CreatePostCommand>>();
-
-        //app.MapGet("/api/posts", (
-        //        CreatePostCommand command,
-        //        CreatePostHandler handler,
-        //        CancellationToken cancellationToken
-        //    ) => handler.HandleAsync(command, cancellationToken))
-        //    .AddEndpointFilter<GenericFluentValidationFilter<CreatePostCommand>>();
+        
     }
 }

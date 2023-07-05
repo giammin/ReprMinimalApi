@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using System.Reflection;
+using FluentValidation;
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.Rewrite;
 using ReprMinimalApi.Filters;
@@ -13,9 +14,12 @@ public static class ConfigExtensions
 {
     public static WebApplicationBuilder ConfigureServices(this WebApplicationBuilder builder)
     {
-        builder.Services.AddTransient<CreatePostHandler>();
-        builder.Services.AddTransient<GenericFluentValidationFilter<CreatePostCommand>>();
-        builder.Services.AddTransient<IValidator<CreatePostCommand>, CreatePostCommandValidator>();
+        foreach (var type in Assembly.GetExecutingAssembly().GetTypes().Where(t=>t.Name.EndsWith("Handler") && !t.IsAbstract && !t.IsInterface))
+        {
+            builder.Services.AddScoped(type);
+        }
+        builder.Services.AddScoped<GenericFluentValidationFilter<CreatePostCommand>>();
+        builder.Services.AddValidatorsFromAssemblyContaining<CreatePostCommandValidator>();
 
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
