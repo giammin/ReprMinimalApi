@@ -1,2 +1,5 @@
 # ReprMinimalApi
-some experiments with minimal api and REPR
+
+a kind of template for a minimal api project that use REPR and Result matching
+
+
