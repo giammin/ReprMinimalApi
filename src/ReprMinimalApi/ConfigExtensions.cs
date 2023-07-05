@@ -7,6 +7,8 @@ using ReprMinimalApi.Middleware;
 using ReprMinimalApi.Posts;
 using ReprMinimalApi.Utils;
 using System.Text.RegularExpressions;
+using ReprMinimalApi.Subscribers;
+using ReprMinimalApi.Core;
 
 namespace ReprMinimalApi;
 
@@ -14,10 +16,25 @@ public static class ConfigExtensions
 {
     public static WebApplicationBuilder ConfigureServices(this WebApplicationBuilder builder)
     {
-        foreach (var type in Assembly.GetExecutingAssembly().GetTypes().Where(t=>t.Name.EndsWith("Handler") && !t.IsAbstract && !t.IsInterface))
+        foreach (var type in typeof(Program).Assembly.GetTypes())
         {
-            builder.Services.AddScoped(type);
+            if (type is { IsAbstract: false, IsInterface: false })
+            {
+                if (type.Name.EndsWith("Handler"))
+                {
+                    builder.Services.AddScoped(type);
+                }
+                else
+                {
+                    var subscriberInterface = type.GetInterfaces().FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(ISubscriber<>));
+                    if (subscriberInterface != null)
+                    {
+                        builder.Services.AddScoped(subscriberInterface, type);
+                    }
+                }
+            }
         }
+        builder.Services.AddScoped<DefaultPublisher>();
         builder.Services.AddScoped<GenericFluentValidationFilter<CreatePostCommand>>();
         builder.Services.AddValidatorsFromAssemblyContaining<CreatePostCommandValidator>();
 
@@ -33,6 +50,14 @@ public static class ConfigExtensions
     {
         //HEALTHCHECK
         app.MapGet("", () => Results.Ok());
+        app.MapGet("publish", async (DefaultPublisher publisher, CancellationToken cancellationToken) =>
+        {
+            var message = Guid.NewGuid().ToString();
+            await Task.WhenAll(
+                publisher.Publish(new PingMessage(message),cancellationToken),
+                publisher.Publish(new PongMessage(message), cancellationToken));
+            return Results.NoContent();
+        });
         app.MapPostEndpoints();
         return app;
     }
