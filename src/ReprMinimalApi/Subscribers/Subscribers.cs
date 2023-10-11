@@ -36,11 +36,11 @@ public class Pong2Subscriber : ISubscriber<PongMessage>
     }
 }
 
-public class PIng2Subscriber : ISubscriber<PingMessage>
+public class Ping1Subscriber : ISubscriber<PingMessage>
 {
-    private readonly ILogger<PIng2Subscriber> _logger;
+    private readonly ILogger<Ping1Subscriber> _logger;
 
-    public PIng2Subscriber(ILogger<PIng2Subscriber> logger)
+    public Ping1Subscriber(ILogger<Ping1Subscriber> logger)
     {
         _logger = logger;
     }
